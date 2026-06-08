@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LVO Command Center — Login</title>
+
+<!-- CLERK -->
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_live_Y2xlcmsubHZvLWNsb3VkLmNsb3VkJA"
+  src="https://clerk.lvo-cloud.cloud/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+  type="text/javascript"
+></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --black:       #0a0a0a;
+  --surface:     #111111;
+  --card:        #161616;
+  --border:      #2a2a2a;
+  --border-gold: #b8953f44;
+  --gold:        #b8953f;
+  --gold-light:  #d4a853;
+  --gold-dim:    #7a5f1a;
+  --gold-glow:   #b8953f18;
+  --text:        #e8e6e0;
+  --text-dim:    #9a9690;
+  --text-muted:  #5a5650;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { font-size: 13px; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.3;
+}
+
+#auth-container {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+.auth-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #b8953f14 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.auth-moth {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 0 16px #b8953f22);
+  animation: mothFloat 5s ease-in-out infinite;
+}
+
+@keyframes mothFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-7px); }
+}
+
+.moth-wing-left, .moth-wing-right {
+  transform-origin: 50% 55%;
+  animation: wingBeat 4s ease-in-out infinite alternate;
+}
+.moth-wing-right { animation-direction: alternate-reverse; }
+
+@keyframes wingBeat {
+  0%   { transform: scaleX(1) rotate(-1deg); }
+  100% { transform: scaleX(0.83) rotate(2deg); }
+}
+
+.auth-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 60px;
+  font-weight: 300;
+  letter-spacing: 0.45em;
+  color: var(--gold);
+  margin-bottom: 4px;
+  text-indent: 0.45em;
+  z-index: 1;
+  position: relative;
+}
+
+.auth-subtitle {
+  font-size: 9px;
+  letter-spacing: 0.4em;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  text-transform: uppercase;
+  z-index: 1;
+  position: relative;
+}
+
+#clerk-sign-in-container { 
+  width: 360px; 
+  max-width: 90vw; 
+  z-index: 1;
+  position: relative;
+}
+
+.auth-hint {
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 20px;
+  z-index: 1;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════
+   CLERK OVERRIDES
+═══════════════════════════════════════════ */
+.cl-rootBox                      { font-family: 'DM Mono', monospace !important; }
+.cl-card                         { background: transparent !important; border: 1px solid var(--border-gold) !important; border-radius: 0 !important; box-shadow: none !important; }
+.cl-headerTitle                  { font-family: 'Cormorant Garamond', serif !important; font-weight: 300 !important; letter-spacing: 0.1em !important; color: var(--text) !important; }
+.cl-headerSubtitle               { color: var(--text-muted) !important; font-size: 11px !important; }
+.cl-formFieldLabel               { font-family: 'DM Mono', monospace !important; font-size: 9px !important; letter-spacing: 0.25em !important; color: var(--text-muted) !important; text-transform: uppercase !important; }
+.cl-formFieldInput               { background: var(--card) !important; border: none !important; border-bottom: 1px solid var(--border) !important; border-radius: 0 !important; color: var(--text) !important; font-family: 'DM Mono', monospace !important; }
+.cl-formFieldInput:focus         { border-bottom-color: var(--gold) !important; }
+.cl-formButtonPrimary            { background: var(--gold) !important; color: var(--black) !important; border-radius: 0 !important; font-family: 'DM Mono', monospace !important; font-size: 10px !important; letter-spacing: 0.2em !important; text-transform: uppercase !important; box-shadow: none !important; }
+.cl-formButtonPrimary:hover      { background: var(--gold-light) !important; }
+.cl-footerActionLink             { color: var(--gold) !important; }
+.cl-dividerLine                  { background: var(--border) !important; }
+.cl-dividerText                  { color: var(--text-muted) !important; }
+.cl-socialButtonsIconButton      { background: transparent !important; border: 1px solid var(--border) !important; border-radius: 0 !important; }
+.cl-socialButtonsIconButton:hover{ border-color: var(--gold) !important; }
+.cl-avatarBox                    { border-radius: 0 !important; border: 1px solid var(--border-gold) !important; }
+</style>
+</head>
+<body>
+
+<div id="auth-container">
+  <div class="auth-glow"></div>
+
+  <svg class="auth-moth" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="60" cy="62" rx="5" ry="18" fill="#7a5f1a"/>
+    <ellipse cx="60" cy="62" rx="3.5" ry="16" fill="#b8953f"/>
+    <circle cx="60" cy="42" r="6" fill="#b8953f"/>
+    <line x1="60" y1="38" x2="44" y2="24" stroke="#b8953f" stroke-width="1.2"/>
+    <circle cx="43" cy="23" r="2" fill="#d4a853"/>
+    <line x1="60" y1="38" x2="76" y2="24" stroke="#b8953f" stroke-width="1.2"/>
+    <circle cx="77" cy="23" r="2" fill="#d4a853"/>
+    <g class="moth-wing-left">
+      <path d="M57 55 Q30 35 18 50 Q14 70 30 75 Q45 78 57 68 Z" fill="#b8953f" opacity="0.85"/>
+      <path d="M57 65 Q35 68 25 82 Q28 95 42 90 Q54 85 57 72 Z" fill="#9a7a30" opacity="0.8"/>
+      <path d="M57 57 Q40 45 22 52" stroke="#d4a853" stroke-width="0.7" fill="none" opacity="0.6"/>
+      <path d="M57 62 Q42 58 28 65" stroke="#d4a853" stroke-width="0.5" fill="none" opacity="0.5"/>
+      <path d="M57 66 Q45 72 32 80" stroke="#d4a853" stroke-width="0.5" fill="none" opacity="0.5"/>
+    </g>
+    <g class="moth-wing-right">
+      <path d="M63 55 Q90 35 102 50 Q106 70 90 75 Q75 78 63 68 Z" fill="#b8953f" opacity="0.85"/>
+      <path d="M63 65 Q85 68 95 82 Q92 95 78 90 Q66 85 63 72 Z" fill="#9a7a30" opacity="0.8"/>
+      <path d="M63 57 Q80 45 98 52" stroke="#d4a853" stroke-width="0.7" fill="none" opacity="0.6"/>
+      <path d="M63 62 Q78 58 92 65" stroke="#d4a853" stroke-width="0.5" fill="none" opacity="0.5"/>
+      <path d="M63 66 Q75 72 88 80" stroke="#d4a853" stroke-width="0.5" fill="none" opacity="0.5"/>
+    </g>
+    <circle cx="35" cy="60" r="5" fill="#0a0a0a" opacity="0.5"/>
+    <circle cx="35" cy="60" r="3" fill="#d4a853" opacity="0.4"/>
+    <circle cx="85" cy="60" r="5" fill="#0a0a0a" opacity="0.5"/>
+    <circle cx="85" cy="60" r="3" fill="#d4a853" opacity="0.4"/>
+  </svg>
+
+  <div class="auth-title">L V O</div>
+  <div class="auth-subtitle">Holdings LLC — Command Center</div>
+  <div id="clerk-sign-in-container"></div>
+  <div class="auth-hint" id="auth-loading-hint">Initializing secure access...</div>
+</div>
+
+<script>
+const CLERK_ALLOWED_DOMAINS = ['lvo-cloud.cloud','dash.lvo-cloud.cloud','login.lvo-cloud.cloud','online.lvo-cloud.cloud'];
+const DASHBOARD_URL = 'https://dash.lvo-cloud.cloud';
+
+const clerkAppearance = {
+  variables: {
+    colorBackground:'#0a0a0a', colorText:'#e8e6e0', colorPrimary:'#b8953f',
+    colorInputBackground:'#161616', colorInputText:'#e8e6e0',
+    borderRadius:'0px', fontFamily:"'DM Mono', monospace", fontSize:'13px'
+  },
+  elements: {
+    card:{ background:'transparent', border:'1px solid #b8953f44', boxShadow:'none', borderRadius:'0' },
+    headerTitle:{ fontFamily:"'Cormorant Garamond', serif", fontWeight:'300', letterSpacing:'0.1em', color:'#e8e6e0' },
+    headerSubtitle:{ color:'#5a5650', fontSize:'11px' },
+    formFieldLabel:{ fontFamily:"'DM Mono', monospace", fontSize:'9px', letterSpacing:'0.25em', color:'#5a5650', textTransform:'uppercase' },
+    formFieldInput:{ background:'#161616', border:'none', borderBottom:'1px solid #2a2a2a', borderRadius:'0', color:'#e8e6e0', fontFamily:"'DM Mono', monospace" },
+    formButtonPrimary:{ background:'#b8953f', color:'#0a0a0a', borderRadius:'0', fontFamily:"'DM Mono', monospace", fontSize:'10px', letterSpacing:'0.2em', textTransform:'uppercase', boxShadow:'none' },
+    footerActionLink:{ color:'#b8953f' },
+    dividerLine:{ background:'#2a2a2a' },
+    dividerText:{ color:'#5a5650' },
+    socialButtonsIconButton:{ background:'transparent', border:'1px solid #2a2a2a', borderRadius:'0' },
+    avatarBox:{ borderRadius:'0', border:'1px solid #b8953f44' }
+  }
+};
+
+window.addEventListener('load', async () => {
+  const loadingHint = document.getElementById('auth-loading-hint');
+  
+  try {
+    await Clerk.load({ 
+      allowedRedirectOrigins: CLERK_ALLOWED_DOMAINS.map(d=>`https://${d}`) 
+    });
+  } catch(e) {
+    loadingHint.textContent = 'Auth service unavailable. Check Clerk key.';
+    loadingHint.style.color = '#e05555';
+    console.error('Clerk load error:', e);
+    return;
+  }
+
+  // If already signed in, redirect to dashboard
+  if (Clerk.user) {
+    window.location.href = DASHBOARD_URL;
+    return;
+  }
+
+  // Mount sign-in component
+  loadingHint.textContent = 'Private Command Center';
+  
+  Clerk.mountSignIn(document.getElementById('clerk-sign-in-container'), {
+    appearance: clerkAppearance,
+    routing: 'virtual',
+    afterSignInUrl: DASHBOARD_URL,
+    afterSignUpUrl: DASHBOARD_URL,
+    redirectUrl: DASHBOARD_URL
+  });
+
+  // Listen for auth changes
+  Clerk.addListener(({ user }) => {
+    if (user) {
+      // Redirect to dashboard after successful auth
+      window.location.href = DASHBOARD_URL;
+    }
+  });
+});
+</script>
+
+</body>
+</html>
