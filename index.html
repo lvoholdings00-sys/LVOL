@@ -206,24 +206,7 @@ const CLERK_ALLOWED_DOMAINS = ['lvo-cloud.cloud','dash.lvo-cloud.cloud','login.l
 const DASHBOARD_URL = 'https://online.lvo-cloud.cloud';
 
 const clerkAppearance = {
-  variables: {
-    colorBackground:'#0a0a0a', colorText:'#e8e6e0', colorPrimary:'#b8953f',
-    colorInputBackground:'#161616', colorInputText:'#e8e6e0',
-    borderRadius:'0px', fontFamily:"'DM Mono', monospace", fontSize:'13px'
-  },
-  elements: {
-    card:{ background:'transparent', border:'1px solid #b8953f44', boxShadow:'none', borderRadius:'0' },
-    headerTitle:{ fontFamily:"'Cormorant Garamond', serif", fontWeight:'300', letterSpacing:'0.1em', color:'#e8e6e0' },
-    headerSubtitle:{ color:'#5a5650', fontSize:'11px' },
-    formFieldLabel:{ fontFamily:"'DM Mono', monospace", fontSize:'9px', letterSpacing:'0.25em', color:'#5a5650', textTransform:'uppercase' },
-    formFieldInput:{ background:'#161616', border:'none', borderBottom:'1px solid #2a2a2a', borderRadius:'0', color:'#e8e6e0', fontFamily:"'DM Mono', monospace" },
-    formButtonPrimary:{ background:'#b8953f', color:'#0a0a0a', borderRadius:'0', fontFamily:"'DM Mono', monospace", fontSize:'10px', letterSpacing:'0.2em', textTransform:'uppercase', boxShadow:'none' },
-    footerActionLink:{ color:'#b8953f' },
-    dividerLine:{ background:'#2a2a2a' },
-    dividerText:{ color:'#5a5650' },
-    socialButtonsIconButton:{ background:'transparent', border:'1px solid #2a2a2a', borderRadius:'0' },
-    avatarBox:{ borderRadius:'0', border:'1px solid #b8953f44' }
-  }
+  // ... keep your existing appearance config unchanged
 };
 
 window.addEventListener('load', async () => {
@@ -246,21 +229,18 @@ window.addEventListener('load', async () => {
     return;
   }
 
-  // Mount sign-in component
   loadingHint.textContent = 'Private Command Center';
   
   Clerk.mountSignIn(document.getElementById('clerk-sign-in-container'), {
     appearance: clerkAppearance,
-    routing: 'virtual',
+    routing: 'hash',                    // ← changed from 'virtual' to 'hash'
     afterSignInUrl: DASHBOARD_URL,
     afterSignUpUrl: DASHBOARD_URL,
-    redirectUrl: DASHBOARD_URL
+    // ← removed redirectUrl entirely
   });
 
-  // Listen for auth changes
   Clerk.addListener(({ user }) => {
     if (user) {
-      // Redirect to dashboard after successful auth
       window.location.href = DASHBOARD_URL;
     }
   });
